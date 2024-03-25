@@ -15,19 +15,15 @@ app.listen(3000, () => {
     console.log("server runnig is port 3000");
 });
 
-app.get("/", async (req, res) => {
 
-    res.json({ message: "SASI-NewServices V1.0" });
-
-});
 
 
 
 //create services 
-app.post("/newService", async (req, res) => {
+app.post("/newservices", async (req, res) => {
 
-    const { pathName, methods, dataModel,queryData,params,fields } = req.body;
-    let todo = [pathName, methods, dataModel,queryData,params,fields];
+    const {pathName, methods,dataModel,queryData,params,fields } = req.body;
+    let todo = [pathName, methods,dataModel,queryData,params,fields];
     connection.query(
         "INSERT INTO services (pathName, methods,dataModel,queryData,params,fields) value (?,?,?,?,?,?)",
         todo,
@@ -36,7 +32,7 @@ app.post("/newService", async (req, res) => {
                 return res.status(400).send();
             }
             res.status(200)
-                .json({ message: "create service sucess" });
+                .json({ message: "create services sucess" });
         }
     );
 

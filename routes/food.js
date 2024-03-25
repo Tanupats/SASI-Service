@@ -7,7 +7,7 @@ router.get("*", async (req, res, next) => {
     console.log(path)
     //GET path form url to 
     connection.query("SELECT * FROM services WHERE pathName=? AND methods='GET'", [path], (err, result) => {
-        if(result.length>0){      
+        if(result?.length>0){      
         let { queryData, params } = { ...result[0] };
         //get parameter from path 
         if (params !== "") {
