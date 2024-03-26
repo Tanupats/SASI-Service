@@ -1,6 +1,5 @@
 const express = require("express");
 let cors = require("cors");
-
 const app = express();
 const multer = require("multer");
 const fs = require("fs");
@@ -9,15 +8,11 @@ app.use(cors());
 app.use(express.json());
 app.use('/files', express.static('files'));
 const connection = require("./connection.js");
-var foodRouter = require('./routes/food.js');
+var foodRouter = require('./routes/app.js');
 app.use('/app',foodRouter);
 app.listen(3000, () => {
     console.log("server runnig is port 3000");
 });
-
-
-
-
 
 //create services 
 app.post("/newservices", async (req, res) => {
@@ -35,6 +30,4 @@ app.post("/newservices", async (req, res) => {
                 .json({ message: "create services sucess" });
         }
     );
-
-
 });

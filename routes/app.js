@@ -118,6 +118,50 @@ router.put("*", async (req, res) => {
 });
 
 
+//DELETE METHOD 
+router.delete("*", async (req, res) => {
+    //full paths
+    let path = req.path;
+    let body = req.body;
+
+
+    let appPath = '/'+path.split("/")[1]
+     //console.log('app path/', path.split("/")[1])
+    //console.log('parameter',path.split("/").slice(2))
+    let newPata = path.split("/").slice(2)
+    console.log(newPata)
+
+    //GET path form url to 
+    connection.query("SELECT * FROM services WHERE pathName=? AND methods='PUT'", [appPath], (err, result) => {
+        if (result.length > 0) {
+            let { queryData, dataModel } = { ...result[0] };
+            let bodyPost = [];
+
+            //get body from put 
+            for (let key in body) {
+                console.log(key + ': ' + body[key]);
+                bodyPost.push(body[key])
+            }
+
+            bodyPost.push(newPata[0])
+
+            console.log(bodyPost)
+
+            connection.query(queryData, bodyPost, (err) => {
+                if (err) {
+                    console.log(err)
+                }
+                res.send({ message: "DELETE Data success In Table " + dataModel });
+            });
+
+        } else {
+            res.send({ message: "Cant NOT DELETE path" + path });
+        }
+    });
+   
+});
+
+
 
 
 
