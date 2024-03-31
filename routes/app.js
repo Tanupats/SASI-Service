@@ -19,7 +19,7 @@ router.get("*", async (req, res, next) => {
                 for (const key in req.query) {
                     para = req.query[key];
                 }
-
+console.log(para)
                 connection.query(queryData, [para], (err, result) => {
                     if (err) {
                         console.log(err)
@@ -118,12 +118,12 @@ router.put("*", async (req, res) => {
 });
 
 
+
 //DELETE METHOD 
 router.delete("*", async (req, res) => {
     //full paths
     let path = req.path;
     let body = req.body;
-
 
     let appPath = '/'+path.split("/")[1]
      //console.log('app path/', path.split("/")[1])
@@ -132,7 +132,7 @@ router.delete("*", async (req, res) => {
     console.log(newPata)
 
     //GET path form url to 
-    connection.query("SELECT * FROM services WHERE pathName=? AND methods='PUT'", [appPath], (err, result) => {
+    connection.query("SELECT * FROM services WHERE pathName=? AND methods='DELETE'", [appPath], (err, result) => {
         if (result.length > 0) {
             let { queryData, dataModel } = { ...result[0] };
             let bodyPost = [];
