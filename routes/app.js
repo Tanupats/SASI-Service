@@ -10,17 +10,17 @@ router.get("*", async (req, res, next) => {
         if (result?.length > 0) {
             let { queryData, params } = { ...result[0] };
             //get parameter from path 
+
             if (params !== "") {
                 console.log("have parameter is")
 
-                let para = "";
-
-
+                let para =[];
                 for (const key in req.query) {
-                    para = req.query[key];
+                    para.push(req.query[key]);
                 }
-console.log(para)
-                connection.query(queryData, [para], (err, result) => {
+
+                console.log(para)
+                connection.query(queryData, para, (err, result) => {
                     if (err) {
                         console.log(err)
                     }
@@ -81,8 +81,8 @@ router.put("*", async (req, res) => {
     let body = req.body;
 
 
-    let appPath = '/'+path.split("/")[1]
-     //console.log('app path/', path.split("/")[1])
+    let appPath = '/' + path.split("/")[1]
+    //console.log('app path/', path.split("/")[1])
     //console.log('parameter',path.split("/").slice(2))
     let newPata = path.split("/").slice(2)
     console.log(newPata)
@@ -114,7 +114,7 @@ router.put("*", async (req, res) => {
             res.send({ message: "Cant NOT PUT path" + path });
         }
     });
-   
+
 });
 
 
@@ -125,8 +125,8 @@ router.delete("*", async (req, res) => {
     let path = req.path;
     let body = req.body;
 
-    let appPath = '/'+path.split("/")[1]
-     //console.log('app path/', path.split("/")[1])
+    let appPath = '/' + path.split("/")[1]
+    //console.log('app path/', path.split("/")[1])
     //console.log('parameter',path.split("/").slice(2))
     let newPata = path.split("/").slice(2)
     console.log(newPata)
@@ -158,7 +158,7 @@ router.delete("*", async (req, res) => {
             res.send({ message: "Cant NOT DELETE path" + path });
         }
     });
-   
+
 });
 
 
