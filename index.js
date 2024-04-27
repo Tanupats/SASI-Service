@@ -15,6 +15,10 @@ app.listen(port, () => {
     console.log("server runnig is port 3000");
 });
 
+app.get('/',(req,res)=>{
+    res.send({message:"HELLO API"})
+})
+
 //create services 
 app.post("/newservices", async (req, res) => {
 
