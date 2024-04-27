@@ -1,9 +1,16 @@
 const express = require("express");
 let cors = require("cors");
 const app = express();
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+
+const https = require('https');
+const fs = require('fs');
+const options = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('certificate.pem')
+  };
+  
+ 
+
 app.use(cors());
 app.use(express.json());
 app.use('/files', express.static('files'));
@@ -11,9 +18,15 @@ const connection = require("./connection.js");
 var foodRouter = require('./routes/app.js');
 app.use('/app',foodRouter);
 let port = 4000;
-app.listen(port, () => {
-    console.log("server runnig is port 3000");
-});
+
+// app.listen(port, () => {
+//     console.log("server runnig is port 3000");
+// });
+
+const server = https.createServer(options, app);
+server.listen(port, () => {
+    console.log('Server running on https://localhost:4000/');
+  });
 
 app.get('/',(req,res)=>{
     res.send({message:"HELLO API"})
