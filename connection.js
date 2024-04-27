@@ -1,15 +1,10 @@
-const mysql = require("mysql");
-const connection = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "root",
-    password: "",
-    database: "sasirest",
-});
-        connection.connect((err) => {
+const mysql = require("mysql2");
+const connection = mysql.createConnection('mysql://qhlqn7jo1fq72j6vektp:pscale_pw_ltFNGMaNkhxwVqvdknU6n9UBcTpniYzu3PjZkwCOoRj@aws.connect.psdb.cloud/sasi_delivery?ssl={"rejectUnauthorized":true}');
+connection.connect((err) => {
     if (err) {
         console.log("Connect Erro", err);
         return;
-        
+
     }
     console.log("connect succesFully");
 });
