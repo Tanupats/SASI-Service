@@ -1,9 +1,6 @@
 const express = require("express");
 let cors = require("cors");
 const app = express();
-
-const https = require('https'); 
-app.use(https)
 app.use(cors());
 app.use(express.json());
 app.use('/files', express.static('files'));
