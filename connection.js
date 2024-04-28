@@ -1,4 +1,4 @@
-const mysql = require("mysql");
+const mysql = require("mysql2");
 require('dotenv').config()
 const connection = mysql.createConnection(process.env.API_KEY);
 connection.connect((err) => {

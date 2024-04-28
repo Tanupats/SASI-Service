@@ -23,11 +23,11 @@ app.post("/newservices", async (req, res) => {
     const {pathName, methods,dataModel,queryData,params,fields } = req.body;
     let todo = [pathName, methods,dataModel,queryData,params,fields];
     connection.query(
-        "INSERT INTO services (pathName, methods,dataModel,queryData,params,fields) value (?,?,?,?,?,?)",
+        "INSERT INTO services (pathName, methods,dataModel,queryData,params,fields) VALUES (?,?,?,?,?,?)",
         todo,
         (err) => {
             if (err) {
-                return res.status(400).send();
+                return res.status(400).send(err);
             }
             res.status(200)
                 .json({ message: "create services sucess" });
