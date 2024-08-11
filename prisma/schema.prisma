@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model billsdetail {
+  id       Int     @id @default(autoincrement())
+  bill_ID  String  @db.VarChar(255)
+  foodname String  @db.VarChar(255)
+  price    Decimal @db.Decimal(10, 2)
+  quantity Int
+  note     String? @db.VarChar(50)
+}
+
+model bills {
+  id           Int      @id @default(autoincrement())
+  bill_ID      String   @db.VarChar(255)
+  amount       Decimal  @db.Decimal(10, 2)
+  ordertype    String   @db.VarChar(20)
+  Date_times   DateTime @default(now())
+  statusOrder  String   @db.VarChar(20)
+  customerName String   @db.VarChar(255)
+  queueNumber  String   @db.VarChar(3)
+  messengerId  String   @db.VarChar(255)
+  timeOrder    DateTime @default(now())
+}
+
+model foodmenu {
+  id       Int      @id @default(autoincrement())
+  code     String   @db.VarChar(255)
+  foodname String   @db.VarChar(225)
+  Price    Decimal? @db.Decimal(10, 2)
+  img      String   @db.Text
+  TypeID   Int
+  status   Int      @default(1)
+}
+
+model account {
+  account_id   Int      @id @default(autoincrement())
+  date_account DateTime @db.Date
+  listname     String   @db.VarChar(255)
+  quantity     Int
+  Price        Decimal  @db.Decimal(10, 2)
+  total        Int
+}
+
+model menu_type {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(100)
+}
+
+model users {
+  id         Int    @id @default(autoincrement())
+  name       String @db.VarChar(255)
+  email      String @db.VarChar(255)
+  password   String @db.VarChar(255)
+  department String @db.VarChar(255)
+}
+
+model shop {
+  id      Int      @id @default(autoincrement())
+  name    String   @db.VarChar(255)
+  shop_id String   @default(uuid()) @db.VarChar(60)
+  user_id String   @unique @db.VarChar(255)
+  creted  DateTime @default(now())
+  photo   String   @db.VarChar(255)
+}
