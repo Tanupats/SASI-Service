@@ -2,6 +2,54 @@ var express = require("express");
 var router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+/**
+ * @swagger
+ * /foodmenu:
+ *   get:
+ *     tags:
+ *       - Food Menu
+ *     summary: getFoodMenu
+ *     description: This is an example route
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+/**
+/**
+ * @swagger
+ * /foodmenu:
+ *   post:
+ *     tags:
+ *       - Food Menu
+ *     summary: createFoodMenu
+ *     description: This is an example route
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 example: "sa001"
+ *               foodname:
+ *                 type: string
+ *                 example: "menu"
+ *               Price:
+ *                 type: Decimal
+ *                 example: 50.00
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+// code     String   @db.VarChar(255)
+// foodname String   @db.VarChar(225)
+// Price    Decimal? @db.Decimal(10, 2)
+// img      String   @db.Text
+// TypeID   Int
+// status   Int      @default(1)
+
 router.get('/', async (req, res) => {
     const food = await prisma.foodmenu.findMany()
     res.send(food)

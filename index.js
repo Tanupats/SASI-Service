@@ -9,11 +9,18 @@ var postRouter = require('./routes/foodmenu.js');
 var accountRouter = require('./routes/account.js');
 var menuTypeRouter = require('./routes/menutype.js');
 var shopRouter = require('./routes/shop.js');
+var userRounter = require('./routes/user.js');
 app.use('/foodmenu', postRouter);
 app.use('/account', accountRouter);
 app.use('/menutype', menuTypeRouter);
 app.use('/shop', shopRouter);
 app.use('/bills', require('./routes/bills.js'));
+app.use('/billsdetails', require('./routes/billsdetails.js'));
+app.use('/user', userRounter);
+
+const { swaggerUi, swaggerSpec } = require('./swagger');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 const multer = require('multer');
 const path = require('path');
 let uniqueName="";
@@ -28,7 +35,7 @@ const storage = multer.diskStorage({
     }
   });
   
-  const upload = multer({ storage: storage });
+const upload = multer({ storage: storage });
   
   
 const { PrismaClient } = require('@prisma/client');
@@ -108,12 +115,7 @@ app.post('/auth/signin', async (req, res) => {
     })
 })
 
-app.get('/users', async (req, res) => {
-    const result = await prisma.users.findMany()
-    if (result) {
-        res.send(result);
-    }
-})
+
 
 app.get('/auth', async (req, res) => {
     const resPonse = await validateJwt(req.headers.apikey)

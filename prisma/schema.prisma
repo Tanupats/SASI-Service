@@ -9,7 +9,7 @@ datasource db {
 
 model billsdetail {
   id       Int     @id @default(autoincrement())
-  bill_ID  String  @db.VarChar(255)
+  bills_id String  @db.VarChar(255)
   foodname String  @db.VarChar(255)
   price    Decimal @db.Decimal(10, 2)
   quantity Int
@@ -18,7 +18,7 @@ model billsdetail {
 
 model bills {
   id           Int      @id @default(autoincrement())
-  bill_ID      String   @db.VarChar(255)
+  bill_ID      String   @default(uuid()) @db.VarChar(255)
   amount       Decimal  @db.Decimal(10, 2)
   ordertype    String   @db.VarChar(20)
   Date_times   DateTime @default(now())
