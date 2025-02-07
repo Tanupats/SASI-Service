@@ -42,6 +42,7 @@ router.get('/', async (req, res) => {
         res.send(result)
     }
 })
+
 router.get('/shop-user/:id', async (req, res) => {
     const result = await prisma.shop.findMany({where:{user_id:req.params.id}})
     if (result) {
@@ -56,8 +57,9 @@ router.post('/', async (req, res) => {
     }
 })
 
-router.post('/', async (req, res) => {
-    const result = await prisma.shop.create({ data: req.body })
+router.put('/:id', async (req, res) => {
+    const id =  parseInt(req.params.id);
+    const result = await prisma.shop.update({ data: req.body,where:{id:id} })
     if (result) {
         res.send(result)
     }

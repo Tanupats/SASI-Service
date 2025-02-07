@@ -40,7 +40,15 @@ router.put('/', async (req, res) => {
 
 router.delete('/:bills_id', async (req, res) => {
     const id =req.params.bills_id
-    const result = await prisma.billsdetail.delete({ where: { bills_id: id }})
+    const result = await prisma.billsdetail.deleteMany({ where: { bills_id: id }})
+    if (result) {
+        res.send(result)
+    }
+})
+
+router.delete('/remove/:id', async (req, res) => {
+    const id =req.params.bills_id
+    const result = await prisma.billsdetail.delete({ where: { id: id }})
     if (result) {
         res.send(result)
     }
@@ -81,6 +89,26 @@ router.delete('/:bills_id', async (req, res) => {
  *         description: The bills_id of the Bills details
  *         schema:
  *           type: String
+ *     responses:
+ *       200:
+ *         description: Success
+ *
+ */
+/**
+ * @swagger
+ * /billsdetails/remove/{id}:
+ *   delete:
+ *     tags:
+ *       - Bills details
+ *     summary: Delte BilssDetail ById
+ *     description: This is an example route
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *        
+ *         description: The id of the Bills details
+ *         schema:
+ *           type: Number
  *     responses:
  *       200:
  *         description: Success

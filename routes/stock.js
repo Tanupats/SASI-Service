@@ -17,11 +17,11 @@ const jwtMiddleware = async (req, res, next) => {
 };
 /**
  * @swagger
- * /foodmenu:
+ * /stock:
  *   get:
  *     tags:
- *       - Food Menu
- *     summary: getFoodMenu
+ *       - stock
+ *     summary: get stock product
  *     description: This is an example route
  *     responses:
  *       200:
@@ -31,23 +31,17 @@ const jwtMiddleware = async (req, res, next) => {
  * 
 /**
  * @swagger
- * /foodmenu/getByShop/{shop_id}:
+ * /stock/getByProduct/{product_id}:
  *   get:
  *     tags:
- *       - Food Menu
- *     summary: Get food menu by shop
+ *       - stock
+ *     summary: Get stock by product_id
  *     description: This route returns the food menu for a specific shop identified by shop_id, with optional filters through query parameters
  *     parameters:
- *       - name: shop_id
+ *       - name: product_id
  *         in: path
  *         required: true
  *         description: The ID of the shop to retrieve the food menu for
- *         schema:
- *           type: string
- *       - name: menutype
- *         in: query
- *         required: false
- *         description: The category of food to filter the menu (optional)
  *         schema:
  *           type: string
  *       
@@ -61,33 +55,33 @@ const jwtMiddleware = async (req, res, next) => {
 
 /**
  * @swagger
- * /foodmenu/{type_id}:
+ * /stock/{id}:
  *   get:
  *     tags:
- *       - Food Menu
- *     summary: Get food menu by MenuType 
+ *       - stock
+ *     summary: Get stock by stock id 
  *     description: This route returns the food menu for a specific shop identified by shop_id
  *     parameters:
- *       - name: type_id
+ *       - name: id
  *         in: path
  *         required: true
  *         description: The ID of the shop to retrieve the food menu for
  *         schema:
- *           type: string
+ *           type: Number
  *     responses:
  *       200:
  *         description: Success
  *       400:
- *         description: Invalid shop ID
+ *         description: Invalid stock id
  */
 
 /**
  * @swagger
- * /foodmenu:
+ * /stock:
  *   post:
  *     tags:
- *       - Food Menu
- *     summary: createFoodMenu
+ *       - stock
+ *     summary: create stock
  *     description: This is an example route
  *     requestBody:
  *       required: true
@@ -96,15 +90,18 @@ const jwtMiddleware = async (req, res, next) => {
  *           schema:
  *             type: object
  *             properties:
- *               code:
+ *               name:
  *                 type: string
- *                 example: "sa001"
- *               foodname:
+ *                 example: "pork"
+ *               product_id:
+ *                 type: Number
+ *                 example: 1
+ *               shop_id:
  *                 type: string
- *                 example: "menu"
- *               Price:
- *                 type: Decimal
- *                 example: 50.00
+ *                 example: "123shop"
+ *               stock_quantity:
+ *                 type: Number
+ *                 example: 0
  *     responses:
  *       200:
  *         description: Success
@@ -112,11 +109,11 @@ const jwtMiddleware = async (req, res, next) => {
 
 /**
  * @swagger
- * /foodmenu/{id}:
+ * /stock/{id}:
  *   put:
  *     tags:
- *       - Food Menu
- *     summary: updateFoodMenu
+ *       - stock
+ *     summary: update stock product
  *     description: This is an example route
  *     parameters:
  *       - name: id
@@ -132,9 +129,15 @@ const jwtMiddleware = async (req, res, next) => {
  *           schema:
  *             type: object
  *             properties:
- *               shop_id:
+  *               name:
  *                 type: string
- *                 
+ *                 example: "pork"
+ *               product_id:
+ *                 type: Number
+ *                 example: 1
+ *               stock_quantity:
+ *                 type: Number
+ *                 example: 0
  *     responses:
  *       200:
  *         description: Success
@@ -142,23 +145,23 @@ const jwtMiddleware = async (req, res, next) => {
 
 
 router.get('/', async (req, res) => {
-    const food = await prisma.foodmenu.findMany()
+    const food = await prisma.stockProduct.findMany()
     res.send(food)
 })
 
-router.get('/getByShop/:shop_id', jwtMiddleware, async (req, res) => {
+router.get('/getByProduct/:shop_id', jwtMiddleware, async (req, res) => {
     const { menutype } = req.query;
     const shopId = req.params.shop_id;
 
     if (shopId && menutype) {
         // ดึงข้อมูลที่ตรงทั้ง shop_id และ TypeID
-        const food = await prisma.foodmenu.findMany({
+        const food = await prisma.stockProduct.findMany({
             where: { shop_id: shopId, TypeID: parseInt(menutype) }
         });
         res.send(food);
     } else if (shopId) {
         // ดึงข้อมูลตาม shop_id เท่านั้นหาก menutype ไม่มีค่า
-        const food = await prisma.foodmenu.findMany({
+        const food = await prisma.stockProduct.findMany({
             where: { shop_id: shopId }
         });
         res.send(food);
@@ -168,34 +171,40 @@ router.get('/getByShop/:shop_id', jwtMiddleware, async (req, res) => {
     }
 });
 
-router.get('/:type_id', async (req, res) => {
-    const food = await prisma.foodmenu.findMany({ where: { TypeID: parseInt(req.params.type_id) } })
-    res.send(food)
-})
-
-router.post('/', jwtMiddleware, async (req, res) => {
+router.get('/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
     try {
-        const result = await prisma.foodmenu.create({ data: req.body })
-        if (result) {
-            res.send(result)
-        }
+        const result = await prisma.stockProduct.findUnique({ where: { id:id } })
+        res.send(result)
     } catch (error) {
         res.status(500).send({
-            msg: 'Failed to create food menu',
             error: error.message || 'An unknown error occurred',
         });
     }
 })
 
-router.put('/:id', jwtMiddleware, async (req, res) => {
+router.post('/', async (req, res) => {
+    try {
+        const result = await prisma.stockProduct.create({ data: req.body })
+        if (result) {
+            res.send(result)
+        }
+    } catch (error) {
+        res.status(500).send({
+            error: error.message || 'An unknown error occurred',
+        });
+    }
+})
+
+router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id);
     try {
-        const result = await prisma.foodmenu.update({
+        const result = await prisma.stockProduct.update({
             where: { id: id },
             data: req.body,
         });
 
-        res.status(200).send({ data: result, msg: 'Updated food menu successfully' });
+        res.status(200).send(result);
     } catch (error) {
         res.status(500).send({
             msg: 'Failed to update food menu',
@@ -207,7 +216,7 @@ router.put('/:id', jwtMiddleware, async (req, res) => {
 router.delete('/:id', jwtMiddleware, async (req, res) => {
     const id = parseInt(req.params.id);
     try {
-        const result = await prisma.foodmenu.delete({ where: { id: id } })
+        const result = await prisma.stockProduct.delete({ where: { id: id } })
         if (result) {
             res.send({ data: result, msg: 'deleted foodMenu' })
         }

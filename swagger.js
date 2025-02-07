@@ -13,7 +13,7 @@ const options = {
       description: 'API documentation for SASI POS App',
     },
   },
-  apis: ['./routes/*.js'], // กำหนด path ของไฟล์ที่มีการคอมเมนต์ swagger
+  apis: ['./routes/*.js','index.js'], // กำหนด path ของไฟล์ที่มีการคอมเมนต์ swagger
 };
 
 const swaggerSpec = swaggerJsdoc(options);

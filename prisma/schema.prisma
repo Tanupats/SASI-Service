@@ -8,12 +8,14 @@ datasource db {
 }
 
 model billsdetail {
-  id       Int     @id @default(autoincrement())
-  bills_id String  @db.VarChar(255)
-  foodname String  @db.VarChar(255)
-  price    Decimal @db.Decimal(10, 2)
+  id       Int       @id @default(autoincrement())
+  foodname String    @db.VarChar(255)
+  price    Decimal   @db.Decimal(10, 2)
   quantity Int
-  note     String? @db.VarChar(50)
+  note     String?   @db.VarChar(50)
+  bills_id String    @db.VarChar(255)
+  created  DateTime? @default(now()) @db.DateTime(0)
+  shop_id  String?   @db.VarChar(255)
 }
 
 model bills {
@@ -27,6 +29,7 @@ model bills {
   queueNumber  String   @db.VarChar(3)
   messengerId  String   @db.VarChar(255)
   timeOrder    DateTime @default(now())
+  shop_id      String   @default("")
 }
 
 model foodmenu {
@@ -37,6 +40,8 @@ model foodmenu {
   img      String   @db.Text
   TypeID   Int
   status   Int      @default(1)
+  shop_id  String?  @db.VarChar(50)
+  stockId  Int?     @default(0)
 }
 
 model account {
@@ -46,11 +51,14 @@ model account {
   quantity     Int
   Price        Decimal  @db.Decimal(10, 2)
   total        Int
+  weight       Decimal  @default(0.00) @db.Decimal(10, 2)
+  shop_id      String?  @db.VarChar(50)
 }
 
 model menu_type {
-  id   Int    @id @default(autoincrement())
-  name String @db.VarChar(100)
+  id      Int     @id @default(autoincrement())
+  name    String  @db.VarChar(100)
+  shop_id String? @db.VarChar(50)
 }
 
 model users {
@@ -63,9 +71,19 @@ model users {
 
 model shop {
   id      Int      @id @default(autoincrement())
-  name    String   @db.VarChar(255)
   shop_id String   @default(uuid()) @db.VarChar(60)
   user_id String   @unique @db.VarChar(255)
   creted  DateTime @default(now())
   photo   String   @db.VarChar(255)
+  name    String   @db.VarChar(255)
+}
+
+model stockProduct {
+  id             Int       @id @default(autoincrement())
+  shop_id        String    @db.VarChar(25)
+  name           String    @db.VarChar(255)
+  product_id     String    @db.VarChar(255)
+  created        DateTime? @default(now()) @db.DateTime(0)
+  updated        DateTime? @default(now()) @db.DateTime(0)
+  stock_quantity Int?      @default(0)
 }

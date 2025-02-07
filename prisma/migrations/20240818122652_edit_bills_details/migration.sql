@@ -8,3 +8,4 @@
 -- AlterTable
 ALTER TABLE `billsdetail` DROP COLUMN `bill_ID`,
     ADD COLUMN `bills_id` VARCHAR(255) NOT NULL;
+
