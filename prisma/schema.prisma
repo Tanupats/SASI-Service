@@ -30,6 +30,8 @@ model bills {
   messengerId  String   @db.VarChar(255)
   timeOrder    DateTime @default(now())
   shop_id      String   @default("")
+  printStatus  String?  @db.VarChar(255)
+  address      String?  @db.Text
 }
 
 model foodmenu {
@@ -42,6 +44,8 @@ model foodmenu {
   status   Int      @default(1)
   shop_id  String?  @db.VarChar(50)
   stockId  Int?     @default(0)
+  note     String?  @db.Text
+  notes    String?  @db.Text
 }
 
 model account {
@@ -50,7 +54,7 @@ model account {
   listname     String   @db.VarChar(255)
   quantity     Int
   Price        Decimal  @db.Decimal(10, 2)
-  total        Int
+  total        Decimal? @db.Decimal(10, 2)
   weight       Decimal  @default(0.00) @db.Decimal(10, 2)
   shop_id      String?  @db.VarChar(50)
 }

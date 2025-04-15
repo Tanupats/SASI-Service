@@ -16,7 +16,8 @@ const jwtMiddleware = async (req, res, next) => {
     }
 };
 const dayjs = require('dayjs');
-router.get('/reportByMounth',jwtMiddleware, async (req, res) => {
+
+router.get('/reportByMounth/:shop_id', jwtMiddleware, async (req, res) => {
     try {
         const today = new Date();
         const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -31,6 +32,7 @@ router.get('/reportByMounth',jwtMiddleware, async (req, res) => {
                     gte: startOfMonth,
                     lte: endOfMonth,
                 },
+                shop_id: req.params.shop_id
             },
         });
 
@@ -42,9 +44,9 @@ router.get('/reportByMounth',jwtMiddleware, async (req, res) => {
 });
 
 
-router.post('/searchByDate',jwtMiddleware, async (req, res) => {
-    let { startDate} = req.body;
-
+router.post('/searchByDate', jwtMiddleware, async (req, res) => {
+    let { startDate, shop_id } = req.body;
+    console.log('searchByDate')
     // กำหนดช่วงเวลาให้ครอบคลุมทั้งวันสำหรับ startDate และ endDate
     const startOfDay = dayjs(startDate).startOf('day').toDate();
     const endOfDay = dayjs(startDate).endOf('day').toDate();
@@ -57,7 +59,8 @@ router.post('/searchByDate',jwtMiddleware, async (req, res) => {
                     gte: startOfDay,
                     lte: endOfDay,
                 },
-            },
+                shop_id: shop_id
+            }
         });
 
         // คำนวณยอดรวมของ amount ในช่วงวันที่เดียวกัน
@@ -71,11 +74,11 @@ router.post('/searchByDate',jwtMiddleware, async (req, res) => {
                     gte: startOfDay,
                     lte: endOfDay,
                 },
+                shop_id: shop_id
             },
         });
-
         res.send({
-            total_bill: totalAmount?._count,
+            total_bill: totalAmount?._count || 0,
             data: bills,
             total: totalAmount?._sum?.amount || 0
         });
@@ -94,7 +97,7 @@ router.get('', jwtMiddleware, async (req, res) => {
 
     try {
         // Prepare the order by condition
-        const orderBy = sortBy && sortOrder 
+        const orderBy = sortBy && sortOrder
             ? { [sortBy]: sortOrder.toLowerCase() === 'desc' ? 'desc' : 'asc' }
             : undefined;
 
@@ -124,7 +127,6 @@ router.get('', jwtMiddleware, async (req, res) => {
 });
 
 
-
 router.get('/myorder', async (req, res) => {
     const { messengerId } = req.query;
     const today = new Date();
@@ -146,8 +148,7 @@ router.get('/myorder', async (req, res) => {
 });
 
 
-router.post('', jwtMiddleware,async (req, res) => {
-    console.log(req.body)
+router.post('', jwtMiddleware, async (req, res) => {
     try {
         const result = await prisma.bills.create({ data: req.body })
         if (result) {
@@ -158,11 +159,59 @@ router.post('', jwtMiddleware,async (req, res) => {
     }
 })
 
+const sendMessageToBlock = async (userId, message) => {
+    const chatfuelAPI = `https://api.chatfuel.com/bots/5e102b272685af000183388a/users/${userId}/send?chatfuel_token=qwYLsCSz8hk4ytd6CPKP4C0oalstMnGdpDjF8YFHPHCieKNc0AfrnjVs91fGuH74&chatfuel_block_name=order_new&message=${encodeURIComponent(message)}`;
+    await fetch(chatfuelAPI, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+    });
+};
+
+
+router.get("/queuenumber/:number", async (req, res) => {
+    try {
+        const today = new Date().toISOString().split("T")[0]; // ได้วันที่ปัจจุบันในรูปแบบ YYYY-MM-DD
+        const result = await prisma.bills.findMany({
+            where: {
+                queueNumber: req.params.number,
+                Date_times: {
+                    gte: new Date(today + "T00:00:00.000Z"), // เริ่มต้นของวัน
+                    lt: new Date(today + "T23:59:59.999Z"),  // สิ้นสุดของวัน
+                },
+            },
+        });
+        if (result.length > 0) {
+            res.json(result);
+        } else {
+            res.json(result);
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post('/order', async (req, res) => {
+    try {
+        const result = await prisma.bills.create({ data: req.body })
+        const { customerName } = req.body;
+        res.send(result);
+        sendMessageToBlock("5278425388913881", customerName);
+        sendMessageToBlock("5095443500561638", customerName);
+        sendMessageToBlock("2893704667353704", customerName);
+    } catch (error) {
+        res.status(500).send({ error: "Error", details: error.message });
+    }
+})
+
 router.put('/:id', async (req, res) => {
-    const id = parseInt(req.params.id);
-    const result = await prisma.bills.update({ where: { id: id }, data: req.body })
-    if (result) {
-        res.send(result)
+    try {
+        const id = parseInt(req.params.id);
+        const result = await prisma.bills.update({ where: { id: id }, data: req.body })
+        if (result) {
+            res.send(result)
+        }
+    } catch (error) {
+        res.status(500).send({ error: "Error", details: error.message });
     }
 })
 

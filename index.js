@@ -3,6 +3,7 @@ let cors = require("cors");
 const fs = require('fs');
 const app = express();
 app.use(cors());
+app.options("*", cors());
 app.use(express.json());
 app.use('/files', express.static('files'));
 var postRouter = require('./routes/foodmenu.js');

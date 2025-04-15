@@ -31,27 +31,33 @@ router.post('', async (req, res) => {
 
 })
 
-router.put('/', async (req, res) => {
-    const result = await prisma.billsdetail.update({ where: { id: req.params.id }, data: req.body })
+router.put('/:id', async (req, res) => {
+    const id = parseInt(req.params.id)
+    const result = await prisma.billsdetail.update({ where: { id: id }, data: req.body })
     if (result) {
         res.send(result)
     }
 })
 
 router.delete('/:bills_id', async (req, res) => {
-    const id =req.params.bills_id
-    const result = await prisma.billsdetail.deleteMany({ where: { bills_id: id }})
+    const id = req.params.bills_id
+    const result = await prisma.billsdetail.deleteMany({ where: { bills_id: id } })
     if (result) {
         res.send(result)
     }
 })
 
 router.delete('/remove/:id', async (req, res) => {
-    const id =req.params.bills_id
-    const result = await prisma.billsdetail.delete({ where: { id: id }})
-    if (result) {
-        res.send(result)
+    const id = parseInt(req.params.id)
+    try {
+        const result = await prisma.billsdetail.delete({ where: { id: id } })
+        if (result) {
+            res.send(result)
+        }
+    } catch (error) {
+        res.status(500).send({ error: "Error", details: error.message });
     }
+
 })
 
 /**
