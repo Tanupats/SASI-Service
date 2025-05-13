@@ -21,6 +21,7 @@ router.get('', async (req, res) => {
                     gte: startOfDay,
                     lte: endOfDay
                 },
+                shop_id: req.query.shop_id
             },
         });
 
@@ -45,11 +46,13 @@ router.get('/outcome', async (req, res) => {
                 gte: startOfDay,
                 lte: endOfDay,
             },
+            shop_id: req.query.shop_id
         },
     });
     res.send(result)
 })
 
+//รายจ่ายวันที่ปัจจุบัน
 router.get('/outcome-mounth', async (req, res) => {
     // วันที่ปัจจุบัน
     const today = new Date();
@@ -70,6 +73,7 @@ router.get('/outcome-mounth', async (req, res) => {
                     gte: startOfMonth, // มากกว่าหรือเท่ากับวันที่เริ่มต้นของเดือน
                     lte: endOfMonth,   // น้อยกว่าหรือเท่ากับวันที่สิ้นสุดของเดือน
                 },
+                shop_id: req.query.shop_id
             },
         });
 
@@ -80,6 +84,7 @@ router.get('/outcome-mounth', async (req, res) => {
     }
 });
 
+//สรุปรายการสั่งซื้อบ่อย 
 router.get('/report', async (req, res) => {
 
     const today = new Date();
@@ -101,16 +106,16 @@ router.get('/report', async (req, res) => {
                 },
             },
         });
-        
+
         //ปรับข้อมูลให้อยู่ในรูปแบบที่ต้องการ
         const formattedData = rawData.map(item => ({
             listname: item.listname,
             count: item._sum.quantity || 0, // รวมค่า quantity ในแต่ละ listname (แทน null ด้วย 0)
         }));
-        
+
         // ส่งผลลัพธ์กลับ
         res.send(formattedData);
-        
+
     } catch (error) {
         console.error(error);
         res.status(500).send({ error: 'An error occurred while fetching data.' });

@@ -2,8 +2,18 @@ const express = require("express");
 let cors = require("cors");
 const fs = require('fs');
 const app = express();
-app.use(cors());
-app.options("*", cors());
+
+// ตั้งค่า CORS แบบเจาะจง origin
+const corsOptions = {
+  origin: "*", // หรือใช้ array ได้ถ้ามีหลายโดเมน
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+// ให้รองรับ preflight request
+app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use('/files', express.static('files'));
 var postRouter = require('./routes/foodmenu.js');
@@ -161,7 +171,7 @@ app.post('/auth/signin', async (req, res) => {
   //if user not exist than return status 400
   if (!user) {
     return res.status(400).json({ msg: "User not exist" })
-  } 
+  }
 
   bcrypt.compare(password, user.password, async (err, data) => {
     if (err) throw err
@@ -255,7 +265,19 @@ app.get('/users', jwtMiddleware, async (req, res) => {
   }
 })
 
+async function startServer() {
+  try {
+    app.listen(port, () => {
+      console.log("server runnig is port ", port);
+    });
+    // ทดสอบการเชื่อมต่อฐานข้อมูล
+    await prisma.$connect();
+    console.log("✅ Connected to the database successfully");
 
-app.listen(port, () => {
-  console.log("server runnig is port ", port);
-});
+  } catch (error) {
+    console.error("❌ Failed to connect to the database:", error);
+    process.exit(1); // ปิดโปรแกรมถ้าเชื่อมไม่ได้
+  }
+}
+
+startServer();

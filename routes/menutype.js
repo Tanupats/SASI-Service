@@ -156,6 +156,13 @@ router.get('/:shop_id', jwtMiddleware, async (req, res) => {
 
 });
 
+//ดึงประเภทสินค้าจากร้านค้า
+router.get('/shop/:shop_id', async (req, res) => {
+    const shopId = req.params.shop_id;
+    const result = await prisma.menu_type.findMany({ where: { shop_id: shopId } });
+    res.send(result)
+});
+
 router.put('/:id', jwtMiddleware, async (req, res) => {
     const shopId = parseInt(req.params.id);
     try {

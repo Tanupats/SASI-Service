@@ -32,6 +32,8 @@ model bills {
   shop_id      String   @default("")
   printStatus  String?  @db.VarChar(255)
   address      String?  @db.Text
+  step         Int?     @default(0)
+  payment_type String   @default("bank_transfer") @db.VarChar(15)
 }
 
 model foodmenu {

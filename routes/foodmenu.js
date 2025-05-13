@@ -157,6 +157,32 @@ router.get('/getByShop/:shop_id', jwtMiddleware, async (req, res) => {
         });
         res.send(food);
     } else if (shopId) {
+        const limit = parseInt(req.query.limit) || 10; // จำนวนรายการที่ต้องการ เช่น 10
+        const offset = parseInt(req.query.offset) || 0; // เริ่มที่รายการที่เท่าไร เช่น 0
+        const food = await prisma.foodmenu.findMany({
+          where: { shop_id: shopId },
+          skip: offset,
+          take: limit,
+        });
+        res.send(food);
+    } else {
+        // กรณีที่ไม่มีค่า shopId ส่งกลับข้อความผิดพลาด
+        res.status(400).send({ error: 'shop_id is required' });
+    }
+});
+
+//ดึงเมนูจากร้านค้า
+router.get('/shop/:shop_id', async (req, res) => {
+    const { menutype } = req.query;
+    const shopId = req.params.shop_id;
+
+    if (shopId && menutype) {
+        // ดึงข้อมูลที่ตรงทั้ง shop_id และ TypeID
+        const food = await prisma.foodmenu.findMany({
+            where: { shop_id: shopId, TypeID: parseInt(menutype) }
+        });
+        res.send(food);
+    } else if (shopId) {
         // ดึงข้อมูลตาม shop_id เท่านั้นหาก menutype ไม่มีค่า
         const food = await prisma.foodmenu.findMany({
             where: { shop_id: shopId }
@@ -170,7 +196,7 @@ router.get('/getByShop/:shop_id', jwtMiddleware, async (req, res) => {
 
 router.get('/:type_id', async (req, res) => {
     const food = await prisma.foodmenu.findMany({ where: { TypeID: parseInt(req.params.type_id) } })
-    res.send(food)
+    res.send(food);
 })
 
 router.post('/', jwtMiddleware, async (req, res) => {

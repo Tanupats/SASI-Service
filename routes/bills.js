@@ -43,6 +43,36 @@ router.get('/reportByMounth/:shop_id', jwtMiddleware, async (req, res) => {
     }
 });
 
+router.get('/counter-order-status/:shop_id', jwtMiddleware, async (req, res) => {
+    try {
+        const today = new Date();
+
+        // กำหนดช่วงเวลาเริ่มต้นของวันนี้
+        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+        
+        // กำหนดช่วงเวลาสิ้นสุดของวันนี้
+        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+        
+        const countResult = await prisma.bills.count({
+          where: {
+            Date_times: {
+              gte: startOfDay,
+              lte: endOfDay,
+            },
+            shop_id: req.params.shop_id,
+            statusOrder: req.query.statusOrder, // ใช้ filter ตาม query ที่ส่งมา
+          },
+        });
+        
+        res.json({ count: countResult });
+        
+          
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error retrieving monthly sales total");
+    }
+});
+
 
 router.post('/searchByDate', jwtMiddleware, async (req, res) => {
     let { startDate, shop_id } = req.body;
@@ -147,6 +177,35 @@ router.get('/myorder', async (req, res) => {
 
 });
 
+router.get('/counter-myorder', async (req, res) => {
+    const { messengerId } = req.query;
+    const today = new Date();
+
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    try {
+        const count = await prisma.bills.count({
+            where: {
+                messengerId: messengerId,
+                Date_times: {
+                    gte: startOfDay,
+                    lte: endOfDay
+                },
+                NOT: {
+                    statusOrder: 'สำเร็จ'
+                }
+            }
+        });
+
+        res.json({ count });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Something went wrong.' });
+    }
+});
+
+
 
 router.post('', jwtMiddleware, async (req, res) => {
     try {
@@ -222,6 +281,40 @@ router.delete('/:id', async (req, res) => {
         res.send(result)
     }
 })
+
+
+/**
+ * @swagger
+ * /bills/counter-myorder:
+ *   get:
+ *     tags:
+ *       - Bills
+ *     summary: นับจำนวนออเดอร์ของ Messenger ที่ยังไม่จัดส่งสำเร็จ
+ *     description: คืนค่าจำนวนบิลของ Messenger ตาม `messengerId` ที่ยังไม่อยู่ในสถานะ "สำเร็จ" และอยู่ภายในวันปัจจุบัน
+ *     parameters:
+ *       - in: query
+ *         name: messengerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: รหัสของผู้ส่ง (Messenger ID)
+ *     responses:
+ *       200:
+ *         description: สำเร็จ - คืนค่าจำนวนออเดอร์
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   example: 3
+ *       400:
+ *         description: ข้อมูลไม่ครบ เช่น ไม่ได้ส่ง messengerId
+ *       500:
+ *         description: เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์
+ */
+
 
 /**
  * @swagger
